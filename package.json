@@ -1,0 +1,26 @@
+{
+  "name": "optimocord",
+  "version": "0.1.0",
+  "description": "Desktop media optimizer UI for messaging platform upload limits",
+  "main": "main.js",
+  "scripts": {
+    "dev": "electron .",
+    "start": "electron .",
+    "check": "node --check main.js && node --check preload.js && node --check src/renderer.js"
+  },
+  "keywords": [
+    "electron",
+    "media",
+    "optimizer",
+    "discord",
+    "compression"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^36.1.0"
+  },
+  "dependencies": {
+    "optimo": "^0.0.24"
+  }
+}

@@ -1,0 +1,6 @@
+/.megamemory
+/node_modules
+/dist
+/out
+/tmp
+*.log
