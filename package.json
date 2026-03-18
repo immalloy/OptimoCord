@@ -18,9 +18,10 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^36.1.0"
+    "electron": "30.5.1"
   },
   "dependencies": {
-    "optimo": "^0.0.24"
+    "optimo": "^0.0.24",
+    "svgo": "^4.0.1"
   }
 }

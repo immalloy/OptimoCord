@@ -20,6 +20,12 @@ It helps files fit upload limits automatically with a modern, fast-feeling UI.
 ./scripts/run.sh
 ```
 
+If your system is Ubuntu/Debian and media binaries are missing:
+
+```bash
+./scripts/install-deps-ubuntu.sh
+```
+
 Or manually:
 
 ```bash
@@ -50,3 +56,15 @@ If a required binary is missing, the app will show a clear error with missing co
 - `npm run dev` - Launch the Electron app
 - `npm run start` - Alias of `dev`
 - `npm run check` - Basic syntax check for app files
+- `./scripts/run.sh` - Startup helper with environment and dependency checks
+- `./scripts/install-deps-ubuntu.sh` - Install required system binaries on Ubuntu/Debian
+
+## Linux Troubleshooting
+
+If you see a GTK error like `GTK 2/3 symbols detected`, use the project-pinned Electron version by running:
+
+```bash
+./scripts/run.sh
+```
+
+This project pins Electron `30.5.1`, which avoids the GTK conflict seen on some Linux desktops.
