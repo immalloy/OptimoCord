@@ -2,9 +2,10 @@ const elements = {
   dropZone: document.getElementById("dropZone"),
   fileInput: document.getElementById("fileInput"),
   fileHint: document.getElementById("fileHint"),
-  platformGrid: document.getElementById("platformGrid"),
+  platformRadios: document.querySelectorAll('input[name="platform"]'),
   platformLimit: document.getElementById("platformLimit"),
-  discordTiers: document.getElementById("discordTiers"),
+  discordTiersWrap: document.getElementById("discordTiers"),
+  discordTierRadios: document.querySelectorAll('input[name="discordTier"]'),
   qualitySlider: document.getElementById("qualitySlider"),
   qualityValue: document.getElementById("qualityValue"),
   forceFit: document.getElementById("forceFit"),
@@ -27,15 +28,13 @@ const elements = {
   copyBtn: document.getElementById("copyBtn"),
   openFolderBtn: document.getElementById("openFolderBtn"),
   themeBtn: document.getElementById("themeBtn"),
-  settingsBtn: document.getElementById("settingsBtn")
+  settingsBtn: document.getElementById("settingsBtn"),
+  srStatus: document.getElementById("srStatus"),
+  srAlert: document.getElementById("srAlert")
 };
 
 const platformLimitsMB = {
-  discord: {
-    free: 10,
-    nitroBasic: 50,
-    nitro: 500
-  },
+  discord: { free: 10, nitroBasic: 50, nitro: 500 },
   whatsapp: 100,
   telegram: 2000,
   slack: 1000,
@@ -56,6 +55,20 @@ const state = {
   stagedProgressTimer: null
 };
 
+function announceStatus(message) {
+  elements.srStatus.textContent = "";
+  window.setTimeout(() => {
+    elements.srStatus.textContent = message;
+  }, 10);
+}
+
+function announceAlert(message) {
+  elements.srAlert.textContent = "";
+  window.setTimeout(() => {
+    elements.srAlert.textContent = message;
+  }, 10);
+}
+
 function bytesToSize(bytes) {
   if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
   const units = ["B", "KB", "MB", "GB"];
@@ -64,15 +77,13 @@ function bytesToSize(bytes) {
   return `${value.toFixed(value >= 100 || index === 0 ? 0 : 1)} ${units[index]}`;
 }
 
-function extensionFromName(fileName) {
-  const dot = fileName.lastIndexOf(".");
-  return dot === -1 ? "" : fileName.slice(dot).toLowerCase();
+function getPlatformLabel(platform) {
+  return platform.charAt(0).toUpperCase() + platform.slice(1);
 }
 
-function isImageName(fileName) {
-  return [".jpg", ".jpeg", ".png", ".webp", ".avif", ".heic", ".heif", ".tiff", ".bmp"].includes(
-    extensionFromName(fileName)
-  );
+function getSelectedRadioValue(radios) {
+  const checked = [...radios].find((radio) => radio.checked);
+  return checked ? checked.value : null;
 }
 
 function resolveTargetLimitBytes() {
@@ -83,13 +94,9 @@ function resolveTargetLimitBytes() {
   return platformLimitsMB[state.selectedPlatform] * 1024 * 1024;
 }
 
-function getPlatformLabel(platform) {
-  return platform.charAt(0).toUpperCase() + platform.slice(1);
-}
-
 function updatePlatformLimitLabel() {
   if (!state.selectedPlatform) {
-    elements.platformLimit.textContent = "Select a platform";
+    elements.platformLimit.textContent = "Select a platform to see upload limit";
     return;
   }
 
@@ -100,7 +107,7 @@ function updatePlatformLimitLabel() {
       ? ` ${state.selectedDiscordTier === "nitroBasic" ? "Nitro Basic" : state.selectedDiscordTier.charAt(0).toUpperCase() + state.selectedDiscordTier.slice(1)}`
       : "";
 
-  elements.platformLimit.textContent = `${platformName}${tierLabel} • ${bytesToSize(target)} limit`;
+  elements.platformLimit.textContent = `${platformName}${tierLabel} limit: ${bytesToSize(target)}`;
 }
 
 function estimateOutputBytes() {
@@ -112,10 +119,7 @@ function estimateOutputBytes() {
   const rawEstimate = state.file.size * qualityFactor * convertBoost;
   const target = resolveTargetLimitBytes();
 
-  if (elements.forceFit.checked) {
-    return Math.min(rawEstimate, target * 0.98);
-  }
-
+  if (elements.forceFit.checked) return Math.min(rawEstimate, target * 0.98);
   return Math.min(rawEstimate, target * 1.05);
 }
 
@@ -123,6 +127,7 @@ function updatePreview() {
   const target = resolveTargetLimitBytes();
   const estimate = estimateOutputBytes();
   const hasData = Boolean(state.file && state.selectedPlatform);
+
   state.targetBytes = target;
   state.estimatedBytes = estimate;
 
@@ -131,19 +136,26 @@ function updatePreview() {
   elements.outTarget.textContent = target ? bytesToSize(target) : "-";
   elements.outEstimated.textContent = hasData ? bytesToSize(estimate) : "-";
 
-  if (hasData) {
+  if (!hasData) {
+    elements.outCompression.textContent = "-";
+    elements.outCompression.classList.remove("good");
+    elements.beforeInfo.textContent = "Drop a file to preview details";
+    elements.afterInfo.textContent = "Optimized output estimate appears here";
+  } else {
     const compression = Math.max(0, 100 - (estimate / state.file.size) * 100);
     elements.outCompression.textContent = `${compression.toFixed(1)}% smaller`;
     elements.outCompression.classList.toggle("good", compression >= 15);
     elements.beforeInfo.textContent = `${bytesToSize(state.file.size)} • ${state.file.type || "Unknown format"}`;
-    elements.afterInfo.textContent = `${bytesToSize(estimate)} • Fits ${bytesToSize(target)} target`;
-  } else {
-    elements.outCompression.textContent = "-";
-    elements.beforeInfo.textContent = "Drop a file to preview details";
-    elements.afterInfo.textContent = "Optimized output estimate appears here";
+    elements.afterInfo.textContent = `${bytesToSize(estimate)} • Fits ${bytesToSize(target)} limit`;
   }
 
   elements.optimizeBtn.disabled = !(state.file && state.selectedPlatform) || state.processing;
+}
+
+function setProgressPercent(percent) {
+  const clamped = Math.max(0, Math.min(100, percent));
+  elements.progressFill.style.transform = `scaleX(${clamped / 100})`;
+  elements.progressPct.textContent = `${clamped}%`;
 }
 
 function resetProcessState() {
@@ -153,59 +165,51 @@ function resetProcessState() {
   }
 
   state.outputPath = null;
-  elements.progressFill.style.width = "0%";
-  elements.progressPct.textContent = "0%";
-  elements.progressStage.textContent = "Idle";
   elements.statePill.textContent = "Waiting";
   elements.statePill.classList.remove("success");
+  elements.progressStage.textContent = "Idle";
+  setProgressPercent(0);
+
   elements.resultActions.hidden = true;
   elements.successBanner.hidden = true;
-  elements.successBanner.textContent = "Ready to send ✅";
+  elements.successBanner.textContent = "Ready to send";
+  elements.successBanner.classList.remove("error");
 }
 
 function setFile(file) {
   state.file = file;
   state.filePath = file.path || null;
-  elements.fileHint.textContent = file ? `${file.name} • ${bytesToSize(file.size)}` : "No file selected";
+  elements.fileHint.textContent = `${file.name} • ${bytesToSize(file.size)}`;
   resetProcessState();
   updatePreview();
+  announceStatus(`Loaded ${file.name}`);
 }
 
 function handleDrop(event) {
   event.preventDefault();
   elements.dropZone.classList.remove("drag-active");
-
   const dropped = event.dataTransfer?.files?.[0];
-  if (!dropped) return;
-  setFile(dropped);
+  if (dropped) setFile(dropped);
 }
 
-function selectPlatform(platform) {
-  state.selectedPlatform = platform;
+function syncSelectedPlatform() {
+  state.selectedPlatform = getSelectedRadioValue(elements.platformRadios);
+  elements.discordTiersWrap.hidden = state.selectedPlatform !== "discord";
 
-  const pills = elements.platformGrid.querySelectorAll(".platform-pill");
-  pills.forEach((pill) => {
-    const active = pill.dataset.platform === platform;
-    pill.classList.toggle("active", active);
-    pill.setAttribute("aria-checked", String(active));
-  });
-
-  elements.discordTiers.classList.toggle("visible", platform === "discord");
   updatePlatformLimitLabel();
   resetProcessState();
   updatePreview();
+
+  if (state.selectedPlatform) {
+    announceStatus(`${getPlatformLabel(state.selectedPlatform)} selected`);
+  }
 }
 
-function selectDiscordTier(tier) {
-  state.selectedDiscordTier = tier;
-
-  const tierPills = elements.discordTiers.querySelectorAll(".tier-pill");
-  tierPills.forEach((pill) => {
-    pill.classList.toggle("active", pill.dataset.tier === tier);
-  });
-
+function syncDiscordTier() {
+  state.selectedDiscordTier = getSelectedRadioValue(elements.discordTierRadios) || "free";
   updatePlatformLimitLabel();
   updatePreview();
+  announceStatus(`Discord ${state.selectedDiscordTier} selected`);
 }
 
 function startProcessingUI() {
@@ -213,29 +217,31 @@ function startProcessingUI() {
   elements.optimizeBtn.disabled = true;
   elements.resultActions.hidden = true;
   elements.successBanner.hidden = true;
+  elements.successBanner.classList.remove("error");
+
   elements.statePill.textContent = "Processing";
   elements.statePill.classList.remove("success");
 
   const stages = [
-    { stage: "Analyzing", pct: 18 },
-    { stage: "Optimizing", pct: 53 },
+    { stage: "Analyzing", pct: 20 },
+    { stage: "Compressing", pct: 55 },
     { stage: "Finalizing", pct: 82 }
   ];
 
-  let idx = 0;
+  let index = 0;
   const tick = () => {
-    const step = stages[idx];
+    const step = stages[index];
     if (!step) return;
     elements.progressStage.textContent = step.stage;
-    elements.progressPct.textContent = `${step.pct}%`;
-    elements.progressFill.style.width = `${step.pct}%`;
-    idx += 1;
-    if (idx < stages.length) {
-      state.stagedProgressTimer = window.setTimeout(tick, 550);
+    setProgressPercent(step.pct);
+    index += 1;
+    if (index < stages.length) {
+      state.stagedProgressTimer = window.setTimeout(tick, 520);
     }
   };
 
   tick();
+  announceStatus("Optimization started");
 }
 
 function finalizeProcessingUI({ optimizedSize, compressionPercent, outputPath }) {
@@ -249,20 +255,23 @@ function finalizeProcessingUI({ optimizedSize, compressionPercent, outputPath })
   state.estimatedBytes = optimizedSize;
 
   elements.progressStage.textContent = "Done";
-  elements.progressPct.textContent = "100%";
-  elements.progressFill.style.width = "100%";
+  setProgressPercent(100);
 
   elements.statePill.textContent = "Complete";
   elements.statePill.classList.add("success");
+
   elements.resultActions.hidden = false;
   elements.successBanner.hidden = false;
-  elements.successBanner.textContent = "Ready to send ✅";
-  elements.optimizeBtn.disabled = false;
+  elements.successBanner.classList.remove("error");
+  elements.successBanner.textContent = "Ready to send";
 
+  elements.optimizeBtn.disabled = false;
   elements.outEstimated.textContent = bytesToSize(optimizedSize);
   elements.outCompression.textContent = `${compressionPercent.toFixed(1)}% smaller`;
   elements.outCompression.classList.toggle("good", compressionPercent >= 15);
   elements.afterInfo.textContent = `${bytesToSize(optimizedSize)} • Ready to send`;
+
+  announceStatus("Optimization complete. File is ready.");
 }
 
 function failProcessingUI(errorMessage) {
@@ -273,39 +282,41 @@ function failProcessingUI(errorMessage) {
 
   state.processing = false;
   elements.optimizeBtn.disabled = false;
-  elements.progressStage.textContent = "Failed";
-  elements.progressPct.textContent = "0%";
-  elements.progressFill.style.width = "0%";
   elements.statePill.textContent = "Error";
+  elements.statePill.classList.remove("success");
+  elements.progressStage.textContent = "Failed";
+  setProgressPercent(0);
+
   elements.successBanner.hidden = false;
+  elements.successBanner.classList.add("error");
   elements.successBanner.textContent = errorMessage;
+
+  announceAlert(errorMessage);
 }
 
 async function runOptimization() {
   if (!state.file || !state.selectedPlatform || state.processing) return;
+
   if (!state.filePath || !window.desktopAPI?.optimizeFile) {
-    failProcessingUI("Desktop file access unavailable. Please run this in Electron.");
+    failProcessingUI("Desktop file access unavailable. Please run this app in Electron.");
     return;
   }
 
   startProcessingUI();
 
-  const quality = Number(elements.qualitySlider.value);
   const payload = {
     filePath: state.filePath,
     fileName: state.file.name,
     targetBytes: state.targetBytes,
-    quality,
+    quality: Number(elements.qualitySlider.value),
     forceFit: elements.forceFit.checked,
-    autoConvert: elements.autoConvert.checked,
-    isImage: isImageName(state.file.name)
+    autoConvert: elements.autoConvert.checked
   };
 
   const result = await window.desktopAPI.optimizeFile(payload);
 
   if (!result?.ok) {
-    const msg = result?.error || "Optimization failed.";
-    failProcessingUI(msg);
+    failProcessingUI(result?.error || "Optimization failed.");
     return;
   }
 
@@ -316,35 +327,48 @@ async function runOptimization() {
   });
 }
 
-async function triggerDownload() {
+async function showOutputFile() {
   if (!state.outputPath || !window.desktopAPI?.showItem) return;
   await window.desktopAPI.showItem(state.outputPath);
 }
 
 async function copySummary() {
   if (!state.file) return;
+
   const text = `${state.file.name}: ${bytesToSize(state.file.size)} -> ${bytesToSize(state.estimatedBytes)} (${elements.outCompression.textContent})`;
 
   try {
     await navigator.clipboard.writeText(text);
     elements.copyBtn.textContent = "Copied";
     window.setTimeout(() => {
-      elements.copyBtn.textContent = "Copy to clipboard";
-    }, 1200);
+      elements.copyBtn.textContent = "Copy summary";
+    }, 1000);
+    announceStatus("Summary copied to clipboard");
   } catch {
-    elements.copyBtn.textContent = "Copy failed";
-    window.setTimeout(() => {
-      elements.copyBtn.textContent = "Copy to clipboard";
-    }, 1200);
+    failProcessingUI("Could not copy summary to clipboard.");
   }
 }
 
 async function openFolder() {
-  if (window.desktopAPI?.openDownloads) {
-    await window.desktopAPI.openDownloads();
-    return;
-  }
-  window.alert("Downloads folder is only available in desktop mode.");
+  if (!window.desktopAPI?.openDownloads) return;
+  await window.desktopAPI.openDownloads();
+}
+
+function applyTheme(theme) {
+  const isDark = theme === "dark";
+  document.body.classList.toggle("dark", isDark);
+  elements.themeBtn.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+}
+
+function toggleTheme() {
+  const next = document.body.classList.contains("dark") ? "light" : "dark";
+  localStorage.setItem("optimocord-theme", next);
+  applyTheme(next);
+}
+
+function initTheme() {
+  const saved = localStorage.getItem("optimocord-theme");
+  applyTheme(saved === "dark" ? "dark" : "light");
 }
 
 function initEvents() {
@@ -359,51 +383,39 @@ function initEvents() {
 
   elements.dropZone.addEventListener("drop", handleDrop);
 
-  elements.dropZone.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      elements.fileInput.click();
-    }
-  });
-
   elements.fileInput.addEventListener("change", (event) => {
-    const selected = event.target.files?.[0];
-    if (selected) setFile(selected);
+    const file = event.target.files?.[0];
+    if (file) setFile(file);
   });
 
-  elements.platformGrid.addEventListener("click", (event) => {
-    const target = event.target.closest(".platform-pill");
-    if (!target) return;
-    selectPlatform(target.dataset.platform);
+  elements.platformRadios.forEach((radio) => {
+    radio.addEventListener("change", syncSelectedPlatform);
   });
 
-  elements.discordTiers.addEventListener("click", (event) => {
-    const target = event.target.closest(".tier-pill");
-    if (!target) return;
-    selectDiscordTier(target.dataset.tier);
+  elements.discordTierRadios.forEach((radio) => {
+    radio.addEventListener("change", syncDiscordTier);
   });
+
+  elements.forceFit.addEventListener("change", updatePreview);
+  elements.autoConvert.addEventListener("change", updatePreview);
 
   elements.qualitySlider.addEventListener("input", () => {
     elements.qualityValue.textContent = `${elements.qualitySlider.value}%`;
     updatePreview();
   });
 
-  elements.forceFit.addEventListener("change", updatePreview);
-  elements.autoConvert.addEventListener("change", updatePreview);
   elements.optimizeBtn.addEventListener("click", runOptimization);
-  elements.downloadBtn.addEventListener("click", triggerDownload);
+  elements.downloadBtn.addEventListener("click", showOutputFile);
   elements.copyBtn.addEventListener("click", copySummary);
   elements.openFolderBtn.addEventListener("click", openFolder);
-
-  elements.themeBtn.addEventListener("click", () => {
-    document.body.classList.toggle("light");
-  });
+  elements.themeBtn.addEventListener("click", toggleTheme);
 
   elements.settingsBtn.addEventListener("click", () => {
-    window.alert("Settings panel coming next: codec presets, bitrate controls, and output naming rules.");
+    announceStatus("Settings panel is not built yet.");
   });
 }
 
+initTheme();
 initEvents();
 updatePlatformLimitLabel();
 updatePreview();

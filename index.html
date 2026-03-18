@@ -13,179 +13,227 @@
     <link rel="stylesheet" href="src/styles.css" />
   </head>
   <body>
-    <div class="app-shell">
-      <div class="bg-orb bg-orb-left" aria-hidden="true"></div>
-      <div class="bg-orb bg-orb-right" aria-hidden="true"></div>
+    <a href="#appMain" class="skip-link">Skip to main content</a>
 
-      <header class="top-bar">
-        <div class="brand">
-          <div class="brand-dot" aria-hidden="true"></div>
-          <span class="brand-name">OptimoCord</span>
-        </div>
+    <header class="top-bar">
+      <div class="brand-wrap">
+        <p class="brand-kicker">Media Compression Commands</p>
+        <h1 class="brand-name">OptimoCord</h1>
+      </div>
 
-        <div class="top-actions">
-          <button class="icon-btn" id="settingsBtn" type="button" aria-label="Open settings">
-            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
-              <path
-                d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm9.08 4.25-1.5.86a7.6 7.6 0 0 1-.45 1.07l.85 1.5a1 1 0 0 1-.17 1.21l-1.2 1.2a1 1 0 0 1-1.2.16l-1.5-.85c-.35.18-.7.33-1.08.45l-.86 1.5a1 1 0 0 1-1 .5h-1.7a1 1 0 0 1-1-.5l-.86-1.5a7.73 7.73 0 0 1-1.07-.45l-1.5.85a1 1 0 0 1-1.21-.16l-1.2-1.2a1 1 0 0 1-.16-1.2l.85-1.5a7.6 7.6 0 0 1-.45-1.08l-1.5-.86a1 1 0 0 1-.5-1v-1.7a1 1 0 0 1 .5-1l1.5-.86c.12-.38.27-.73.45-1.08l-.85-1.5a1 1 0 0 1 .16-1.2l1.2-1.2a1 1 0 0 1 1.21-.17l1.5.85c.34-.18.7-.33 1.07-.45l.86-1.5a1 1 0 0 1 1-.5h1.7a1 1 0 0 1 1 .5l.86 1.5c.38.12.73.27 1.08.45l1.5-.85a1 1 0 0 1 1.2.17l1.2 1.2a1 1 0 0 1 .17 1.2l-.85 1.5c.18.35.33.7.45 1.08l1.5.86a1 1 0 0 1 .5 1v1.7a1 1 0 0 1-.5 1Z"
-              />
-            </svg>
-          </button>
-          <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle theme">
-            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
-              <path
-                d="M20.6 14.2a8.2 8.2 0 0 1-10.8-10.8A1 1 0 0 0 8.7 2a10 10 0 1 0 13.3 13.3 1 1 0 0 0-1.4-1.1Z"
-              />
-            </svg>
-          </button>
-        </div>
-      </header>
+      <div class="top-actions">
+        <button class="icon-btn" id="settingsBtn" type="button" aria-label="Open settings">
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <path
+              d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm9.08 4.25-1.5.86a7.6 7.6 0 0 1-.45 1.07l.85 1.5a1 1 0 0 1-.17 1.21l-1.2 1.2a1 1 0 0 1-1.2.16l-1.5-.85c-.35.18-.7.33-1.08.45l-.86 1.5a1 1 0 0 1-1 .5h-1.7a1 1 0 0 1-1-.5l-.86-1.5a7.73 7.73 0 0 1-1.07-.45l-1.5.85a1 1 0 0 1-1.21-.16l-1.2-1.2a1 1 0 0 1-.16-1.2l.85-1.5a7.6 7.6 0 0 1-.45-1.08l-1.5-.86a1 1 0 0 1-.5-1v-1.7a1 1 0 0 1 .5-1l1.5-.86c.12-.38.27-.73.45-1.08l-.85-1.5a1 1 0 0 1 .16-1.2l1.2-1.2a1 1 0 0 1 1.21-.17l1.5.85c.34-.18.7-.33 1.07-.45l.86-1.5a1 1 0 0 1 1-.5h1.7a1 1 0 0 1 1 .5l.86 1.5c.38.12.73.27 1.08.45l1.5-.85a1 1 0 0 1 1.2.17l1.2 1.2a1 1 0 0 1 .17 1.2l-.85 1.5c.18.35.33.7.45 1.08l1.5.86a1 1 0 0 1 .5 1v1.7a1 1 0 0 1-.5 1Z"
+            />
+          </svg>
+          <span>Settings</span>
+        </button>
+        <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch to dark mode">
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <path
+              d="M20.6 14.2a8.2 8.2 0 0 1-10.8-10.8A1 1 0 0 0 8.7 2a10 10 0 1 0 13.3 13.3 1 1 0 0 0-1.4-1.1Z"
+            />
+          </svg>
+          <span>Theme</span>
+        </button>
+      </div>
+    </header>
 
-      <main class="main-grid" id="mainGrid">
-        <section class="workflow-column">
-          <article class="panel dropzone-panel">
-            <label class="dropzone" id="dropZone" for="fileInput" tabindex="0">
-              <input id="fileInput" type="file" />
-              <div class="dropzone-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="img">
-                  <path
-                    d="M12 3a1 1 0 0 1 1 1v8.58l2.3-2.29a1 1 0 1 1 1.4 1.42l-4 3.99a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.4-1.4L11 12.57V4a1 1 0 0 1 1-1Zm-7 14a1 1 0 0 1 1 1v1h12v-1a1 1 0 1 1 2 0v2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1Z"
-                  />
-                </svg>
-              </div>
-              <h1>Drop files here or click to upload</h1>
-              <p>Optimize for messaging platforms instantly</p>
-              <span class="dropzone-hint" id="fileHint">No file selected</span>
+    <main id="appMain" class="layout">
+      <section class="card workflow" aria-labelledby="workflowHeading">
+        <h2 id="workflowHeading">Optimize a file in three steps</h2>
+        <p class="section-copy">Drop one file, pick where you want to send it, then click optimize.</p>
+
+        <section class="step" aria-labelledby="uploadHeading">
+          <div class="step-heading-wrap">
+            <p class="step-index" aria-hidden="true">Step 1</p>
+            <h3 id="uploadHeading">Choose file</h3>
+          </div>
+
+          <label class="dropzone" id="dropZone" for="fileInput">
+            <input id="fileInput" type="file" />
+            <span class="drop-title">Drop files here or click to upload</span>
+            <span class="drop-subtitle">Optimize for messaging platforms instantly</span>
+            <span class="drop-hint" id="fileHint">No file selected</span>
+          </label>
+        </section>
+
+        <section class="step" aria-labelledby="platformHeading">
+          <div class="step-heading-wrap">
+            <p class="step-index" aria-hidden="true">Step 2</p>
+            <h3 id="platformHeading">Choose platform target</h3>
+          </div>
+
+          <fieldset class="choice-group" id="platformGroup">
+            <legend class="sr-only">Messaging platform</legend>
+
+            <label class="choice-pill">
+              <input type="radio" name="platform" value="discord" />
+              <span>Discord</span>
+              <span class="selected-mark" aria-hidden="true">Selected</span>
             </label>
-          </article>
+            <label class="choice-pill">
+              <input type="radio" name="platform" value="whatsapp" />
+              <span>WhatsApp</span>
+              <span class="selected-mark" aria-hidden="true">Selected</span>
+            </label>
+            <label class="choice-pill">
+              <input type="radio" name="platform" value="telegram" />
+              <span>Telegram</span>
+              <span class="selected-mark" aria-hidden="true">Selected</span>
+            </label>
+            <label class="choice-pill">
+              <input type="radio" name="platform" value="slack" />
+              <span>Slack</span>
+              <span class="selected-mark" aria-hidden="true">Selected</span>
+            </label>
+            <label class="choice-pill">
+              <input type="radio" name="platform" value="signal" />
+              <span>Signal</span>
+              <span class="selected-mark" aria-hidden="true">Selected</span>
+            </label>
+            <label class="choice-pill">
+              <input type="radio" name="platform" value="viber" />
+              <span>Viber</span>
+              <span class="selected-mark" aria-hidden="true">Selected</span>
+            </label>
+            <label class="choice-pill">
+              <input type="radio" name="platform" value="wechat" />
+              <span>WeChat</span>
+              <span class="selected-mark" aria-hidden="true">Selected</span>
+            </label>
+          </fieldset>
 
-          <article class="panel">
-            <div class="panel-title-row">
-              <h2>Platform</h2>
-              <span class="meta-pill" id="platformLimit">Select a platform</span>
+          <fieldset class="choice-group choice-group-small" id="discordTiers" hidden>
+            <legend>Discord plan</legend>
+            <label class="choice-pill">
+              <input type="radio" name="discordTier" value="free" checked />
+              <span>Free</span>
+              <span class="selected-mark" aria-hidden="true">Selected</span>
+            </label>
+            <label class="choice-pill">
+              <input type="radio" name="discordTier" value="nitroBasic" />
+              <span>Nitro Basic</span>
+              <span class="selected-mark" aria-hidden="true">Selected</span>
+            </label>
+            <label class="choice-pill">
+              <input type="radio" name="discordTier" value="nitro" />
+              <span>Nitro</span>
+              <span class="selected-mark" aria-hidden="true">Selected</span>
+            </label>
+          </fieldset>
+
+          <p class="target-note" id="platformLimit">Select a platform to see upload limit</p>
+        </section>
+
+        <section class="step" aria-labelledby="optionsHeading">
+          <div class="step-heading-wrap">
+            <p class="step-index" aria-hidden="true">Step 3</p>
+            <h3 id="optionsHeading">Run optimization</h3>
+          </div>
+
+          <div class="switch-row">
+            <div>
+              <p class="field-title">Force Fit Mode</p>
+              <p class="field-help">Always stay under the selected platform limit.</p>
             </div>
+            <label class="switch">
+              <input id="forceFit" type="checkbox" checked />
+              <span class="track"></span>
+            </label>
+          </div>
 
-            <div class="platform-grid" id="platformGrid" role="radiogroup" aria-label="Messaging platforms">
-              <button type="button" class="platform-pill" data-platform="discord">Discord</button>
-              <button type="button" class="platform-pill" data-platform="whatsapp">WhatsApp</button>
-              <button type="button" class="platform-pill" data-platform="telegram">Telegram</button>
-              <button type="button" class="platform-pill" data-platform="slack">Slack</button>
-              <button type="button" class="platform-pill" data-platform="signal">Signal</button>
-              <button type="button" class="platform-pill" data-platform="viber">Viber</button>
-              <button type="button" class="platform-pill" data-platform="wechat">WeChat</button>
-            </div>
-
-            <div class="discord-tiers" id="discordTiers" aria-label="Discord plan tiers">
-              <button type="button" class="tier-pill active" data-tier="free">Free</button>
-              <button type="button" class="tier-pill" data-tier="nitroBasic">Nitro Basic</button>
-              <button type="button" class="tier-pill" data-tier="nitro">Nitro</button>
-            </div>
-          </article>
-
-          <article class="panel">
-            <h2>Options</h2>
-            <div class="option-row">
-              <div>
-                <label for="forceFit">Force Fit Mode</label>
-                <p>Always keep output under platform limit</p>
-              </div>
-              <label class="switch">
-                <input id="forceFit" type="checkbox" checked />
-                <span class="track"></span>
+          <details class="advanced-options">
+            <summary>Advanced options</summary>
+            <div class="advanced-content">
+              <label class="stack-field" for="qualitySlider">
+                <span class="field-title">Quality</span>
+                <span class="field-help">Lower quality can shrink large files more aggressively.</span>
               </label>
-            </div>
-
-            <div class="option-row quality-row">
-              <div>
-                <label for="qualitySlider">Quality</label>
-                <p>High quality keeps more detail</p>
-              </div>
-              <div class="quality-wrap">
-                <div class="quality-labels">
-                  <span>High</span>
-                  <span id="qualityValue">80%</span>
-                  <span>Low</span>
-                </div>
+              <div class="range-row">
+                <span>High</span>
                 <input id="qualitySlider" type="range" min="25" max="100" value="80" />
+                <span>Low</span>
+                <output id="qualityValue" for="qualitySlider">80%</output>
               </div>
-            </div>
 
-            <div class="option-row">
               <label class="check" for="autoConvert">
                 <input id="autoConvert" type="checkbox" checked />
-                <span>Convert format automatically</span>
+                <span>Convert format automatically for better compression</span>
               </label>
             </div>
-          </article>
+          </details>
 
-          <button id="optimizeBtn" class="optimize-btn" type="button" disabled>Optimize Now</button>
+          <button id="optimizeBtn" class="primary-btn" type="button" disabled>Optimize now</button>
+        </section>
+      </section>
+
+      <aside class="card results" aria-labelledby="resultsHeading">
+        <h2 id="resultsHeading">Result preview</h2>
+        <p class="section-copy">Review what will happen before you download the optimized file.</p>
+
+        <dl class="stats-list">
+          <div>
+            <dt>File name</dt>
+            <dd id="outName">-</dd>
+          </div>
+          <div>
+            <dt>Original size</dt>
+            <dd id="outOriginal">-</dd>
+          </div>
+          <div>
+            <dt>Target size</dt>
+            <dd id="outTarget">-</dd>
+          </div>
+          <div>
+            <dt>Estimated output</dt>
+            <dd id="outEstimated">-</dd>
+          </div>
+          <div>
+            <dt>Compression</dt>
+            <dd id="outCompression">-</dd>
+          </div>
+        </dl>
+
+        <div class="progress-wrap" aria-live="polite">
+          <div class="progress-meta">
+            <span id="statePill">Waiting</span>
+            <span id="progressStage">Idle</span>
+            <span id="progressPct">0%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <section class="compare" aria-labelledby="compareHeading">
+          <h3 id="compareHeading">Before / after</h3>
+          <div class="compare-grid">
+            <div>
+              <h4>Before</h4>
+              <p id="beforeInfo">Drop a file to preview details</p>
+            </div>
+            <div>
+              <h4>After</h4>
+              <p id="afterInfo">Optimized output estimate appears here</p>
+            </div>
+          </div>
         </section>
 
-        <section class="preview-column">
-          <article class="panel output-panel">
-            <div class="panel-title-row">
-              <h2>Output Preview</h2>
-              <span class="state-pill" id="statePill">Waiting</span>
-            </div>
+        <p class="status-banner" id="successBanner" hidden>Ready to send</p>
 
-            <dl class="stats-grid">
-              <div>
-                <dt>File name</dt>
-                <dd id="outName">-</dd>
-              </div>
-              <div>
-                <dt>Original size</dt>
-                <dd id="outOriginal">-</dd>
-              </div>
-              <div>
-                <dt>Target size</dt>
-                <dd id="outTarget">-</dd>
-              </div>
-              <div>
-                <dt>Estimated output</dt>
-                <dd id="outEstimated">-</dd>
-              </div>
-              <div>
-                <dt>Compression</dt>
-                <dd id="outCompression">-</dd>
-              </div>
-            </dl>
+        <div class="result-actions" id="resultActions" hidden>
+          <button type="button" id="downloadBtn" class="secondary-btn">Show file</button>
+          <button type="button" id="copyBtn" class="secondary-btn">Copy summary</button>
+          <button type="button" id="openFolderBtn" class="secondary-btn">Open folder</button>
+        </div>
+      </aside>
+    </main>
 
-            <div class="progress-wrap" id="progressWrap" aria-live="polite">
-              <div class="progress-meta">
-                <span id="progressStage">Idle</span>
-                <span id="progressPct">0%</span>
-              </div>
-              <div class="progress-track">
-                <div class="progress-fill" id="progressFill"></div>
-              </div>
-            </div>
-
-            <div class="result-actions" id="resultActions" hidden>
-              <button type="button" id="downloadBtn" class="secondary-btn">Download</button>
-              <button type="button" id="copyBtn" class="secondary-btn">Copy to clipboard</button>
-              <button type="button" id="openFolderBtn" class="secondary-btn">Open folder</button>
-            </div>
-          </article>
-
-          <article class="panel compare-panel">
-            <h2>Before / After</h2>
-            <div class="compare-grid">
-              <div>
-                <h3>Before</h3>
-                <p id="beforeInfo">Drop a file to preview details</p>
-              </div>
-              <div>
-                <h3>After</h3>
-                <p id="afterInfo">Optimized output estimate appears here</p>
-              </div>
-            </div>
-          </article>
-
-          <div class="success-banner" id="successBanner" hidden>Ready to send ✅</div>
-        </section>
-      </main>
-    </div>
+    <p id="srStatus" class="sr-only" role="status" aria-live="polite"></p>
+    <p id="srAlert" class="sr-only" role="alert" aria-live="assertive"></p>
 
     <script src="src/renderer.js" defer></script>
   </body>
