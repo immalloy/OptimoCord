@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "electron .",
     "start": "electron .",
-    "check": "node --check main.js && node --check preload.js && node --check src/renderer.js"
+    "check": "node --check main.js && node --check preload.js && node --check src/renderer.js",
+    "build": "electron-builder",
+    "build:appimage": "electron-builder --linux AppImage",
+    "build:deb": "electron-builder --linux deb"
   },
   "keywords": [
     "electron",
@@ -15,10 +18,30 @@
     "discord",
     "compression"
   ],
-  "author": "",
+  "author": "OptimoCord",
   "license": "MIT",
+  "build": {
+    "appId": "com.optimocord.app",
+    "productName": "OptimoCord",
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "src/**",
+      "node_modules/**"
+    ],
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Utility",
+      "description": "Desktop media optimizer for messaging platform upload limits"
+    },
+    "deb": {
+      "depends": ["ffmpeg", "imagemagick", "gifsicle", "libjpeg-turbo-progs"]
+    }
+  },
   "devDependencies": {
-    "electron": "30.5.1"
+    "electron": "30.5.1",
+    "electron-builder": "^26.8.1"
   },
   "dependencies": {
     "optimo": "^0.0.24",

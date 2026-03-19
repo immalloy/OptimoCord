@@ -1,6 +1,7 @@
 const path = require("path");
 const os = require("os");
 const fs = require("fs/promises");
+const { execFile } = require("child_process");
 const { randomUUID } = require("crypto");
 const { app, BrowserWindow, ipcMain, shell } = require("electron");
 const optimo = require("optimo");
@@ -89,6 +90,19 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
+});
+
+function checkCommand(cmd) {
+  return new Promise((resolve) => {
+    execFile("which", [cmd], (error) => resolve(!error));
+  });
+}
+
+ipcMain.handle("check-binaries", async () => {
+  const required = ["ffmpeg", "magick", "gifsicle", "jpegtran"];
+  const results = await Promise.all(required.map((cmd) => checkCommand(cmd)));
+  const missing = required.filter((_, i) => !results[i]);
+  return { ok: missing.length === 0, missing };
 });
 
 ipcMain.handle("open-downloads", async () => {
