@@ -4,6 +4,15 @@ const fs = require("fs/promises");
 const { execFile } = require("child_process");
 const { randomUUID } = require("crypto");
 const { app, BrowserWindow, ipcMain, shell } = require("electron");
+
+// ─── Prepend bundled bin dir to PATH before optimo resolves binaries ───────────
+// optimo calls `which <binary>` at require() time, so PATH must be set first.
+const bundledBinDir = app.isPackaged
+  ? path.join(process.resourcesPath, "bin")
+  : path.join(__dirname, "bin");
+
+process.env.PATH = bundledBinDir + path.delimiter + (process.env.PATH || "");
+
 const optimo = require("optimo");
 
 const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif", ".heic", ".heif", ".tiff", ".bmp"]);
@@ -92,16 +101,22 @@ app.on("window-all-closed", () => {
   }
 });
 
-function checkCommand(cmd) {
+function binaryExists(name) {
   return new Promise((resolve) => {
-    execFile("which", [cmd], (error) => resolve(!error));
+    execFile("which", [name], (error) => resolve(!error));
   });
 }
 
 ipcMain.handle("check-binaries", async () => {
-  const required = ["ffmpeg", "magick", "gifsicle", "jpegtran"];
-  const results = await Promise.all(required.map((cmd) => checkCommand(cmd)));
-  const missing = required.filter((_, i) => !results[i]);
+  // mozjpegtran.js falls back to jpegtran, so check either name
+  const checks = await Promise.all([
+    binaryExists("ffmpeg"),
+    binaryExists("magick"),
+    binaryExists("gifsicle"),
+    Promise.all([binaryExists("jpegtran"), binaryExists("mozjpegtran")]).then(([a, b]) => a || b)
+  ]);
+  const names = ["ffmpeg", "magick", "gifsicle", "jpegtran"];
+  const missing = names.filter((_, i) => !checks[i]);
   return { ok: missing.length === 0, missing };
 });
 

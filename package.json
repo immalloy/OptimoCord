@@ -7,6 +7,7 @@
     "dev": "electron .",
     "start": "electron .",
     "check": "node --check main.js && node --check preload.js && node --check src/renderer.js",
+    "prebuild": "node scripts/prepare-bins.js",
     "build": "electron-builder",
     "build:appimage": "electron-builder --linux AppImage",
     "build:deb": "electron-builder --linux deb"
@@ -18,7 +19,10 @@
     "discord",
     "compression"
   ],
-  "author": "OptimoCord",
+  "author": {
+    "name": "OptimoCord",
+    "email": "optimocord@localhost"
+  },
   "license": "MIT",
   "build": {
     "appId": "com.optimocord.app",
@@ -30,13 +34,28 @@
       "src/**",
       "node_modules/**"
     ],
+    "extraResources": [
+      {
+        "from": "bin/",
+        "to": "bin/",
+        "filter": ["**/*"]
+      }
+    ],
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "category": "Utility",
       "description": "Desktop media optimizer for messaging platform upload limits"
     },
     "deb": {
-      "depends": ["ffmpeg", "imagemagick", "gifsicle", "libjpeg-turbo-progs"]
+      "depends": [
+        "ffmpeg",
+        "imagemagick",
+        "gifsicle",
+        "libjpeg-turbo-progs"
+      ]
     }
   },
   "devDependencies": {
@@ -44,6 +63,11 @@
     "electron-builder": "^26.8.1"
   },
   "dependencies": {
+    "debug": "^4.4.3",
+    "ffmpeg-static": "^5.3.0",
+    "gifsicle": "^7.0.1",
+    "jpegtran-bin": "^7.0.0",
+    "mozjpeg": "^8.0.0",
     "optimo": "^0.0.24",
     "svgo": "^4.0.1"
   }

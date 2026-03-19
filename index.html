@@ -15,129 +15,115 @@
   <body>
     <a href="#appMain" class="skip-link">Skip to main content</a>
 
-    <header class="top-bar">
-      <div class="brand-wrap">
-        <p class="brand-kicker">Media Compression Commands</p>
-        <h1 class="brand-name">OptimoCord</h1>
+    <header class="app-header">
+      <div class="brand">
+        <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="17 8 12 3 7 8" />
+          <line x1="12" y1="3" x2="12" y2="15" />
+        </svg>
+        <span class="brand-name">OptimoCord</span>
       </div>
 
-      <div class="top-actions">
-        <button class="icon-btn" id="simpleModeBtn" type="button" aria-pressed="true">
-          <span>Simple</span>
-        </button>
-        <button class="icon-btn" id="advancedModeBtn" type="button" aria-pressed="false">
-          <span>Advanced</span>
-        </button>
-        <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch to dark mode">
-          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
-            <path
-              d="M20.6 14.2a8.2 8.2 0 0 1-10.8-10.8A1 1 0 0 0 8.7 2a10 10 0 1 0 13.3 13.3 1 1 0 0 0-1.4-1.1Z"
-            />
+      <div class="header-actions">
+        <div class="mode-switch">
+          <button class="mode-btn" id="simpleModeBtn" type="button" aria-pressed="true">Simple</button>
+          <button class="mode-btn" id="advancedModeBtn" type="button" aria-pressed="false">Advanced</button>
+        </div>
+        <button class="header-btn" id="themeBtn" type="button" aria-label="Switch to dark mode">
+          <svg viewBox="0 0 24 24" aria-hidden="true" width="15" height="15">
+            <path d="M20.6 14.2a8.2 8.2 0 0 1-10.8-10.8A1 1 0 0 0 8.7 2a10 10 0 1 0 13.3 13.3 1 1 0 0 0-1.4-1.1Z" />
           </svg>
-          <span>Theme</span>
+          Theme
         </button>
       </div>
     </header>
 
     <p class="startup-alert" id="startupAlert" hidden></p>
 
-    <main id="appMain" class="layout">
-      <section class="card workflow" aria-labelledby="workflowHeading">
-        <h2 id="workflowHeading">Optimize a file in three steps</h2>
-        <p class="section-copy">Drop one file, pick where you want to send it, then click optimize.</p>
+    <main id="appMain" class="app-main">
+      <!-- Left: file + platform + options -->
+      <div class="left-panel">
+        <label class="dropzone" id="dropZone" for="fileInput">
+          <input id="fileInput" type="file" />
+          <svg class="drop-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="17 8 12 3 7 8" />
+            <line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          <span class="drop-title">Drop a file or click to browse</span>
+          <span class="drop-subtitle">Images and videos — optimized for messaging</span>
+          <span class="drop-hint" id="fileHint">No file selected</span>
+        </label>
 
-        <section class="step" aria-labelledby="uploadHeading">
-          <div class="step-heading-wrap">
-            <p class="step-index" aria-hidden="true">Step 1</p>
-            <h3 id="uploadHeading">Choose file</h3>
-          </div>
-
-          <label class="dropzone" id="dropZone" for="fileInput">
-            <input id="fileInput" type="file" />
-            <span class="drop-title">Drop files here or click to upload</span>
-            <span class="drop-subtitle">Optimize for messaging platforms instantly</span>
-            <span class="drop-hint" id="fileHint">No file selected</span>
-          </label>
-        </section>
-
-        <section class="step" aria-labelledby="platformHeading">
-          <div class="step-heading-wrap">
-            <p class="step-index" aria-hidden="true">Step 2</p>
-            <h3 id="platformHeading">Choose platform target</h3>
-          </div>
-
-          <fieldset class="choice-group" id="platformGroup">
+        <div class="platforms">
+          <p class="section-label">Target platform</p>
+          <fieldset class="pill-grid" id="platformGroup">
             <legend class="sr-only">Messaging platform</legend>
-
-            <label class="choice-pill">
+            <label class="pill">
               <input type="radio" name="platform" value="discord" />
               <span>Discord</span>
-              <span class="selected-mark" aria-hidden="true">Selected</span>
+              <span class="mark" aria-hidden="true">✓</span>
             </label>
-            <label class="choice-pill">
+            <label class="pill">
               <input type="radio" name="platform" value="whatsapp" />
               <span>WhatsApp</span>
-              <span class="selected-mark" aria-hidden="true">Selected</span>
+              <span class="mark" aria-hidden="true">✓</span>
             </label>
-            <label class="choice-pill">
+            <label class="pill">
               <input type="radio" name="platform" value="telegram" />
               <span>Telegram</span>
-              <span class="selected-mark" aria-hidden="true">Selected</span>
+              <span class="mark" aria-hidden="true">✓</span>
             </label>
-            <label class="choice-pill">
+            <label class="pill">
               <input type="radio" name="platform" value="slack" />
               <span>Slack</span>
-              <span class="selected-mark" aria-hidden="true">Selected</span>
+              <span class="mark" aria-hidden="true">✓</span>
             </label>
-            <label class="choice-pill">
+            <label class="pill">
               <input type="radio" name="platform" value="signal" />
               <span>Signal</span>
-              <span class="selected-mark" aria-hidden="true">Selected</span>
+              <span class="mark" aria-hidden="true">✓</span>
             </label>
-            <label class="choice-pill">
+            <label class="pill">
               <input type="radio" name="platform" value="viber" />
               <span>Viber</span>
-              <span class="selected-mark" aria-hidden="true">Selected</span>
+              <span class="mark" aria-hidden="true">✓</span>
             </label>
-            <label class="choice-pill">
+            <label class="pill">
               <input type="radio" name="platform" value="wechat" />
               <span>WeChat</span>
-              <span class="selected-mark" aria-hidden="true">Selected</span>
+              <span class="mark" aria-hidden="true">✓</span>
             </label>
           </fieldset>
 
-          <fieldset class="choice-group choice-group-small" id="discordTiers" hidden>
-            <legend>Discord plan</legend>
-            <label class="choice-pill">
+          <fieldset class="pill-grid tiers" id="discordTiers" hidden>
+            <legend class="sr-only">Discord plan</legend>
+            <label class="pill">
               <input type="radio" name="discordTier" value="free" checked />
               <span>Free</span>
-              <span class="selected-mark" aria-hidden="true">Selected</span>
+              <span class="mark" aria-hidden="true">✓</span>
             </label>
-            <label class="choice-pill">
+            <label class="pill">
               <input type="radio" name="discordTier" value="nitroBasic" />
               <span>Nitro Basic</span>
-              <span class="selected-mark" aria-hidden="true">Selected</span>
+              <span class="mark" aria-hidden="true">✓</span>
             </label>
-            <label class="choice-pill">
+            <label class="pill">
               <input type="radio" name="discordTier" value="nitro" />
               <span>Nitro</span>
-              <span class="selected-mark" aria-hidden="true">Selected</span>
+              <span class="mark" aria-hidden="true">✓</span>
             </label>
           </fieldset>
 
-          <p class="target-note" id="platformLimit">Select a platform to see upload limit</p>
-        </section>
+          <p class="limit-text" id="platformLimit">Select a platform to see upload limit</p>
+        </div>
 
-        <section class="step" aria-labelledby="optionsHeading">
-          <div class="step-heading-wrap">
-            <p class="step-index" aria-hidden="true">Step 3</p>
-            <h3 id="optionsHeading">Run optimization</h3>
-          </div>
-
-          <div class="switch-row">
+        <div class="options-panel">
+          <div class="field-row">
             <div>
-              <p class="field-title">Force Fit Mode</p>
-              <p class="field-help">Always stay under the selected platform limit.</p>
+              <p class="field-label">Force Fit</p>
+              <p class="meta-text">Always stay under the platform limit</p>
             </div>
             <label class="switch">
               <input id="forceFit" type="checkbox" checked />
@@ -145,83 +131,62 @@
             </label>
           </div>
 
-          <details class="advanced-options">
-            <summary>Advanced options</summary>
-            <div class="advanced-content">
-              <label class="stack-field" for="qualitySlider">
-                <span class="field-title">Quality</span>
-                <span class="field-help">Lower quality can shrink large files more aggressively.</span>
-              </label>
-              <div class="range-row">
-                <span>High</span>
-                <input id="qualitySlider" type="range" min="25" max="100" value="80" />
-                <span>Low</span>
-                <output id="qualityValue" for="qualitySlider">80%</output>
-              </div>
-
-              <label class="check" for="autoConvert">
-                <input id="autoConvert" type="checkbox" checked />
-                <span>Convert format automatically for better compression</span>
-              </label>
-              <button type="button" id="resetAdvancedBtn" class="secondary-btn">Reset to defaults</button>
+          <div class="advanced-only">
+            <div class="advanced-head">
+              <p class="field-label">Quality</p>
+              <button type="button" id="resetAdvancedBtn" class="secondary-btn small-btn">Reset</button>
             </div>
-          </details>
-
-          <button id="optimizeBtn" class="primary-btn" type="button" disabled>Optimize now</button>
-        </section>
-      </section>
-
-      <aside class="card results" aria-labelledby="resultsHeading">
-        <h2 id="resultsHeading">Result preview</h2>
-        <p class="section-copy">Review what will happen before you download the optimized file.</p>
-
-        <dl class="stats-list">
-          <div>
-            <dt>File name</dt>
-            <dd id="outName">-</dd>
-          </div>
-          <div>
-            <dt>Original size</dt>
-            <dd id="outOriginal">-</dd>
-          </div>
-          <div>
-            <dt>Target size</dt>
-            <dd id="outTarget">-</dd>
-          </div>
-          <div>
-            <dt>Estimated output</dt>
-            <dd id="outEstimated">-</dd>
-          </div>
-          <div>
-            <dt>Compression</dt>
-            <dd id="outCompression">-</dd>
-          </div>
-        </dl>
-
-        <div class="progress-wrap" aria-live="polite">
-          <div class="progress-meta">
-            <span id="statePill">Waiting</span>
-            <span id="progressStage">Idle</span>
-            <span id="progressPct">0%</span>
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill" id="progressFill"></div>
+            <div class="range-row">
+              <span class="meta-text">High</span>
+              <input id="qualitySlider" type="range" min="25" max="100" value="80" />
+              <span class="meta-text">Low</span>
+              <output id="qualityValue" for="qualitySlider">80%</output>
+            </div>
+            <label class="check" for="autoConvert">
+              <input id="autoConvert" type="checkbox" checked />
+              <span>Auto-convert format for better compression</span>
+            </label>
           </div>
         </div>
 
-        <section class="compare" aria-labelledby="compareHeading">
-          <h3 id="compareHeading">Before / after</h3>
-          <div class="compare-grid">
-            <div>
-              <h4>Before</h4>
-              <p id="beforeInfo">Drop a file to preview details</p>
-            </div>
-            <div>
-              <h4>After</h4>
-              <p id="afterInfo">Optimized output estimate appears here</p>
-            </div>
+        <button id="optimizeBtn" class="optimize-btn" type="button" disabled>Optimize now</button>
+      </div>
+
+      <!-- Right: results -->
+      <div class="right-panel">
+        <dl class="stats-list">
+          <div class="stat-full">
+            <dt>File</dt>
+            <dd id="outName">No file selected</dd>
           </div>
-        </section>
+          <div>
+            <dt>Original size</dt>
+            <dd id="outOriginal">—</dd>
+          </div>
+          <div>
+            <dt>Target limit</dt>
+            <dd id="outTarget">—</dd>
+          </div>
+          <div>
+            <dt>Estimated output</dt>
+            <dd id="outEstimated">—</dd>
+          </div>
+          <div>
+            <dt>Compression</dt>
+            <dd id="outCompression">—</dd>
+          </div>
+        </dl>
+
+        <div class="status-panel" aria-live="polite">
+          <div class="progress-row">
+            <span id="statePill">Waiting</span>
+            <div class="progress-track">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span id="progressPct">0%</span>
+          </div>
+          <p class="meta-text" id="progressStage">Idle</p>
+        </div>
 
         <p class="status-banner" id="successBanner" hidden>Ready to send</p>
 
@@ -230,7 +195,7 @@
           <button type="button" id="copyBtn" class="secondary-btn">Copy summary</button>
           <button type="button" id="openFolderBtn" class="secondary-btn">Open folder</button>
         </div>
-      </aside>
+      </div>
     </main>
 
     <p id="srStatus" class="sr-only" role="status" aria-live="polite"></p>
