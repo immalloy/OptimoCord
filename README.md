@@ -1,70 +1,18 @@
 # OptimoCord
 
-OptimoCord is a desktop media optimizer for messaging platforms like Discord, WhatsApp, Telegram, Slack, and Signal.
+A small desktop app for compressing images and videos to fit the upload limits of Discord, WhatsApp, Telegram, Slack, Signal, and a few others. Drop a file, pick a platform, hit optimize.
 
-It helps files fit upload limits automatically with a modern, fast-feeling UI.
+Built with Electron. All required binaries (ffmpeg, ImageMagick, gifsicle, jpegtran) are bundled — nothing to install.
 
-## Features
+Vibecoded with [Claude Code](https://claude.ai/code).
 
-- Drag-and-drop file upload
-- Platform presets (including Discord tiers)
-- Force Fit mode for strict size targets
-- Quality slider and auto-convert option
-- Output preview with size estimates and compression percentage
-- Animated optimization progress
-- Post-processing actions: Download, Copy to clipboard, Open folder
+## Download
 
-## Run Locally
+Grab the latest AppImage or .deb from [Releases](../../releases).
 
-```bash
-./scripts/run.sh
-```
-
-If your system is Ubuntu/Debian and media binaries are missing:
-
-```bash
-./scripts/install-deps-ubuntu.sh
-```
-
-Or manually:
+## Run from source
 
 ```bash
 npm install
 npm run dev
 ```
-
-## Optimization Engine
-
-OptimoCord uses the published `optimo` npm package (not copied source) for actual media optimization.
-
-- npm package: `optimo`
-- Programmatic API: `optimo.file(...)`
-- Output files are saved to your Downloads folder inside `OptimoCord/`
-
-## System Requirements
-
-- Node.js 22+ works, but `optimo` officially targets Node.js 24+
-- External binaries should be available on your system PATH depending on media type:
-  - `ffmpeg` (video)
-  - `magick` (ImageMagick, common image formats)
-  - `gifsicle`, `jpegtran`, `cjpeg`, `djpeg`, `svgo` (format-specific pipelines)
-
-If a required binary is missing, the app will show a clear error with missing command names.
-
-## Scripts
-
-- `npm run dev` - Launch the Electron app
-- `npm run start` - Alias of `dev`
-- `npm run check` - Basic syntax check for app files
-- `./scripts/run.sh` - Startup helper with environment and dependency checks
-- `./scripts/install-deps-ubuntu.sh` - Install required system binaries on Ubuntu/Debian
-
-## Linux Troubleshooting
-
-If you see a GTK error like `GTK 2/3 symbols detected`, use the project-pinned Electron version by running:
-
-```bash
-./scripts/run.sh
-```
-
-This project pins Electron `30.5.1`, which avoids the GTK conflict seen on some Linux desktops.
