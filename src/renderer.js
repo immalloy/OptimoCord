@@ -17,8 +17,6 @@ const elements = {
   outTarget: document.getElementById("outTarget"),
   outEstimated: document.getElementById("outEstimated"),
   outCompression: document.getElementById("outCompression"),
-  beforeInfo: document.getElementById("beforeInfo"),
-  afterInfo: document.getElementById("afterInfo"),
   progressStage: document.getElementById("progressStage"),
   progressPct: document.getElementById("progressPct"),
   progressFill: document.getElementById("progressFill"),
@@ -27,8 +25,11 @@ const elements = {
   downloadBtn: document.getElementById("downloadBtn"),
   copyBtn: document.getElementById("copyBtn"),
   openFolderBtn: document.getElementById("openFolderBtn"),
+  resetAdvancedBtn: document.getElementById("resetAdvancedBtn"),
   themeBtn: document.getElementById("themeBtn"),
-  settingsBtn: document.getElementById("settingsBtn"),
+  simpleModeBtn: document.getElementById("simpleModeBtn"),
+  advancedModeBtn: document.getElementById("advancedModeBtn"),
+  startupAlert: document.getElementById("startupAlert"),
   srStatus: document.getElementById("srStatus"),
   srAlert: document.getElementById("srAlert")
 };
@@ -51,9 +52,30 @@ const state = {
   estimatedBytes: 0,
   targetBytes: 0,
   processing: false,
+  blockedByMissingBinaries: false,
   outputPath: null,
   stagedProgressTimer: null
 };
+
+function prefersReducedMotion() {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function applyMode(advanced) {
+  document.body.classList.toggle("advanced-mode", advanced);
+  elements.simpleModeBtn.setAttribute("aria-pressed", String(!advanced));
+  elements.advancedModeBtn.setAttribute("aria-pressed", String(advanced));
+
+  if (!advanced) {
+    elements.forceFit.checked = true;
+    elements.autoConvert.checked = true;
+    elements.qualitySlider.value = "80";
+    elements.qualityValue.textContent = "80%";
+  }
+
+  updatePreview();
+  announceStatus(advanced ? "Advanced mode on" : "Simple mode on");
+}
 
 function announceStatus(message) {
   elements.srStatus.textContent = "";
@@ -131,7 +153,7 @@ function updatePreview() {
   state.targetBytes = target;
   state.estimatedBytes = estimate;
 
-  elements.outName.textContent = state.file ? state.file.name : "-";
+  elements.outName.textContent = state.file ? `File: ${state.file.name}` : "File: no file selected";
   elements.outOriginal.textContent = state.file ? bytesToSize(state.file.size) : "-";
   elements.outTarget.textContent = target ? bytesToSize(target) : "-";
   elements.outEstimated.textContent = hasData ? bytesToSize(estimate) : "-";
@@ -139,17 +161,22 @@ function updatePreview() {
   if (!hasData) {
     elements.outCompression.textContent = "-";
     elements.outCompression.classList.remove("good");
-    elements.beforeInfo.textContent = "Drop a file to preview details";
-    elements.afterInfo.textContent = "Optimized output estimate appears here";
   } else {
     const compression = Math.max(0, 100 - (estimate / state.file.size) * 100);
     elements.outCompression.textContent = `${compression.toFixed(1)}% smaller`;
     elements.outCompression.classList.toggle("good", compression >= 15);
-    elements.beforeInfo.textContent = `${bytesToSize(state.file.size)} • ${state.file.type || "Unknown format"}`;
-    elements.afterInfo.textContent = `${bytesToSize(estimate)} • Fits ${bytesToSize(target)} limit`;
   }
 
-  elements.optimizeBtn.disabled = !(state.file && state.selectedPlatform) || state.processing;
+  elements.optimizeBtn.disabled = !(state.file && state.selectedPlatform) || state.processing || state.blockedByMissingBinaries;
+}
+
+function resetAdvancedSettings() {
+  elements.forceFit.checked = true;
+  elements.autoConvert.checked = true;
+  elements.qualitySlider.value = "80";
+  elements.qualityValue.textContent = "80%";
+  updatePreview();
+  announceStatus("Advanced settings reset");
 }
 
 function setProgressPercent(percent) {
@@ -180,9 +207,23 @@ function setFile(file) {
   state.file = file;
   state.filePath = file.path || null;
   elements.fileHint.textContent = `${file.name} • ${bytesToSize(file.size)}`;
+  if (!prefersReducedMotion()) {
+    elements.dropZone.classList.remove("file-ack");
+    window.requestAnimationFrame(() => {
+      elements.dropZone.classList.add("file-ack");
+    });
+  }
   resetProcessState();
   updatePreview();
   announceStatus(`Loaded ${file.name}`);
+}
+
+function triggerPopAnimation(element) {
+  if (prefersReducedMotion()) return;
+  element.classList.remove("is-pop");
+  window.requestAnimationFrame(() => {
+    element.classList.add("is-pop");
+  });
 }
 
 function handleDrop(event) {
@@ -264,12 +305,12 @@ function finalizeProcessingUI({ optimizedSize, compressionPercent, outputPath })
   elements.successBanner.hidden = false;
   elements.successBanner.classList.remove("error");
   elements.successBanner.textContent = "Ready to send";
+  triggerPopAnimation(elements.successBanner);
 
   elements.optimizeBtn.disabled = false;
   elements.outEstimated.textContent = bytesToSize(optimizedSize);
   elements.outCompression.textContent = `${compressionPercent.toFixed(1)}% smaller`;
   elements.outCompression.classList.toggle("good", compressionPercent >= 15);
-  elements.afterInfo.textContent = `${bytesToSize(optimizedSize)} • Ready to send`;
 
   announceStatus("Optimization complete. File is ready.");
 }
@@ -290,6 +331,7 @@ function failProcessingUI(errorMessage) {
   elements.successBanner.hidden = false;
   elements.successBanner.classList.add("error");
   elements.successBanner.textContent = errorMessage;
+  triggerPopAnimation(elements.successBanner);
 
   announceAlert(errorMessage);
 }
@@ -371,6 +413,44 @@ function initTheme() {
   applyTheme(saved === "dark" ? "dark" : "light");
 }
 
+function initMotion() {
+  if (prefersReducedMotion()) return;
+  const main = document.getElementById("appMain");
+  if (!main) return;
+
+  document.body.classList.add("motion-ready");
+  const items = [...main.children];
+  items.forEach((item, index) => {
+    window.setTimeout(() => {
+      item.classList.add("in");
+    }, 60 + index * 55);
+  });
+}
+
+function initMode() {
+  const saved = localStorage.getItem("optimocord-mode");
+  applyMode(saved === "advanced");
+}
+
+async function initBinaryCheck() {
+  if (!window.desktopAPI?.checkBinaries) return;
+
+  const result = await window.desktopAPI.checkBinaries();
+  if (result?.ok) {
+    state.blockedByMissingBinaries = false;
+    elements.startupAlert.hidden = true;
+    updatePreview();
+    return;
+  }
+
+  const missing = result?.missing || [];
+  state.blockedByMissingBinaries = true;
+  elements.startupAlert.hidden = false;
+  elements.startupAlert.textContent = `Missing required binaries: ${missing.join(", ")}. Run ./scripts/install-deps-ubuntu.sh then restart.`;
+  announceAlert(elements.startupAlert.textContent);
+  updatePreview();
+}
+
 function initEvents() {
   elements.dropZone.addEventListener("dragover", (event) => {
     event.preventDefault();
@@ -381,7 +461,20 @@ function initEvents() {
     elements.dropZone.classList.remove("drag-active");
   });
 
+  elements.dropZone.addEventListener("animationend", (event) => {
+    if (event.animationName === "fileAck") {
+      elements.dropZone.classList.remove("file-ack");
+    }
+  });
+
   elements.dropZone.addEventListener("drop", handleDrop);
+
+  elements.dropZone.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      elements.fileInput.click();
+    }
+  });
 
   elements.fileInput.addEventListener("change", (event) => {
     const file = event.target.files?.[0];
@@ -408,14 +501,26 @@ function initEvents() {
   elements.downloadBtn.addEventListener("click", showOutputFile);
   elements.copyBtn.addEventListener("click", copySummary);
   elements.openFolderBtn.addEventListener("click", openFolder);
+  elements.resetAdvancedBtn.addEventListener("click", resetAdvancedSettings);
   elements.themeBtn.addEventListener("click", toggleTheme);
-
-  elements.settingsBtn.addEventListener("click", () => {
-    announceStatus("Settings panel is not built yet.");
+  elements.simpleModeBtn.addEventListener("click", () => {
+    const advanced = false;
+    localStorage.setItem("optimocord-mode", advanced ? "advanced" : "simple");
+    applyMode(advanced);
   });
+
+  elements.advancedModeBtn.addEventListener("click", () => {
+    const advanced = true;
+    localStorage.setItem("optimocord-mode", advanced ? "advanced" : "simple");
+    applyMode(advanced);
+  });
+
 }
 
 initTheme();
+initMode();
 initEvents();
+initMotion();
 updatePlatformLimitLabel();
 updatePreview();
+initBinaryCheck();
