@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax check
+        run: npm run check
+
+      - name: Prepare binaries
+        run: node scripts/prepare-bins.js
+
+      - name: Build AppImage + deb
+        run: npx electron-builder --linux AppImage deb
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: OptimoCord ${{ github.ref_name }}
+          body: |
+            ## OptimoCord ${{ github.ref_name }}
+
+            Desktop media optimizer for Discord, WhatsApp, Telegram, and more.
+
+            ### Installation
+
+            **AppImage** (no install required)
+            ```
+            chmod +x OptimoCord-*.AppImage
+            ./OptimoCord-*.AppImage
+            ```
+
+            **Debian / Ubuntu**
+            ```
+            sudo dpkg -i optimocord_*_amd64.deb
+            ```
+
+            All required binaries (ffmpeg, ImageMagick, gifsicle, jpegtran) are bundled — no system dependencies needed.
+          files: |
+            dist/*.AppImage
+            dist/*.deb
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
